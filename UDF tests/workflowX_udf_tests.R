@@ -1,4 +1,4 @@
-# Code Cowboy Script - Testing user-defined functions for workflow X
+# Company ABC Script - Testing user-defined functions for workflow X
 # Last updated: 28 October 2023
 
 # Load relevant libraries
@@ -19,3 +19,9 @@ us_macro_data <- read.csv(file = "/Users/joel/Documents/University Studies/LSE/Y
 
 us_macro_data_transformed <- percent_change(data = us_macro_data) 
 tail(us_macro_data_transformed) # check default assumption for second argument
+
+us_macro_data_transformed <- percent_change(data = us_macro_data, growth_lag = 1) 
+tail(us_macro_data_transformed) # check second argument works when growth_lag = 1
+
+us_macro_data_transformed <- percent_change(data = us_macro_data, growth_lag = 4) 
+tail(us_macro_data_transformed) # check second argument works when growth_lag = 4
