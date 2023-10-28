@@ -1,0 +1,82 @@
+---
+title: 'Demonstrating the new functionality of the user-defined function: ''percent_change'''
+author: "Employee of the month"
+date: "2023-10-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### What is the user-defined function (UDF) 'percent_change'?
+
+
+The UDF 'percent_change' is an important component of workflow X at our company. It calculates the one-observation-ahead percentage change for all numeric columns in a dataframe, and adds the outputs as new columns in the original dataframe. It is particularly useful for calculating growth rates with time series data (when the time series data are stored as numeric columns in a dataframe). For example, with quarterly time series data, the function calculates quarterly growth rates.
+
+
+### Proposal for improving 'percent_change'
+
+
+Unfortunately, the functionality of percent_change is a little limited. It cannot currently calculate the percentage change in numeric observations (rows) that are not next to each other in a dataframe. For example, it cannot calculate the yearly percentage change in numeric variables in a dataframe containing quarterly observations (since year-on-year rows are not next to each other in such a dataframe)
+
+Fortunately, a simple update to the UDF can address this limitation. The update entails adding a second argument to the function so that users can specify the row-distance between observations to calculate percentage changes for. The updated function is now:
+
+*percent_change(data, growth_lag)*
+
+where 'data' refers to the dataframe that you want to transform by calculating percentage changes (as it does already) and 'growth_lag' specifies the row distance between the observations that you want to calculate the percentage change for. For example, to calculate annual growth rates using quarterly time series data, one would set growth_lag = 4.
+
+The UDF returns a new dataframe containing the old dataframe plus new columns containing the  percentage changes requested of all the original numeric columns in the original dataframe.
+
+I will now demonstrate the new functionality.
+
+
+### Demonstration of updated 'percent_change'
+
+
+First, we need to load the relevant libraries, source the updated function, and read in a test dataset. The test dataset is a dataframe containing quarterly time series data on real GDP and the purchaser price index in the US downloaded from FRED, the Fed Reserve's official data source.
+
+
+```{r Load all necessary inputs, results= 'hide'}
+suppressMessages(library(tidyverse)) # this covers all libraries that we need
+
+source("/Users/joel/Documents/University Studies/LSE/Year 2/Autumn Term/MY472/Assignment 2/Question 1/code_cowboy/UDF scripts/workflowX_udf.R") # this provides access to the updated udf
+
+us_macro_data <- read.csv(file = "/Users/joel/Documents/University Studies/LSE/Year 2/Autumn Term/MY472/Assignment 2/Question 1/code_cowboy/Data/fred_macro_data.csv") # load the test data
+
+# Please note that you will need to change the file paths in the above code to match the location of the cloned repo on your local machine
+```
+
+
+Now we can see how the updated function works. If we don't specify the new argument 'growth_lag', the function calculates the one-period percentage change as it did before. This is because the function has growth_lag = 1 as a default. Because the example data are quarterly data, the function calculates a quarterly growth rate with this execution.
+
+
+```{r udf default}
+us_macro_data_transformed <- percent_change(data = us_macro_data) # execute the function
+tail(us_macro_data_transformed) # print some observations to check the output
+```
+
+
+We can produce the exact same output by specifying growth_lag = 1 in the function execution, see below.
+
+
+```{r udf growth_lag equal 1}
+us_macro_data_qtr_growth <- percent_change(data = us_macro_data, growth_lag = 1) # execute the function
+tail(us_macro_data_qtr_growth) # print some observations to check the output
+```
+
+
+Finally, we can produce yearly growth rates with the quarterly US macroeconomic data by appropriately changing the growth_lag argument, see below.
+
+
+```{r udf growth lag equal 4}
+us_macro_data_annual_growth <- percent_change(data = us_macro_data, growth_lag = 4) # execute the function
+tail(us_macro_data_annual_growth) # print some observations to check the output
+```
+
+### Next steps
+
+
+Once this change to the function has been approved, the function in workflow X's production code will be updated and users can start using the updpated function.
+
+
